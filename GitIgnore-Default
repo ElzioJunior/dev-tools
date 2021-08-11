@@ -1,0 +1,41 @@
+classes/
+logs/
+target/
+*.LOG
+settings.gradle
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+.DS_Store
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+*.jasper
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+### OUT ###
+out/
+
+### Version ###
+src/main/resources/version.properties
+
+### Sonar ###
+.clover/
