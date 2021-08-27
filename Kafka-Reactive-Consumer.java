@@ -57,10 +57,13 @@ public class KafkaConsumer {
                                 return suaServiceJava.seuMetodo(event);
                             })
                             .doOnError(err -> log.error("Erro ao executar processo de service acima", err))
-                            .doOnSuccess(s -> {
+                            .doOnTerminate(s -> {
                                 log.info("Realizando ack na mensagem do offset {}", offset.offset());
                                 offset.acknowledge();
-                            });
+                            })
+			    // esse é um problema.... precisa retornar um objeto que não seja erro para não 
+			    // quebrar a stream, sendo assim não para de processar :/ Tenho que achar uma solução melhor pra isso
+			    .onErrorResume(err -> Mono.empty());
                 })
                 .subscribe();
     }
