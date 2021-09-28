@@ -1,0 +1,47 @@
+# create this file with name .gitlab-ci.yml in your gitlab project
+# use this sonarqube docker image with decorator plugin https://github.com/mc1arke/sonarqube-community-branch-plugin
+# open the project management in sonarqube and enable this feature "DevOps Platform Integration"
+
+SONAR_HOST_URL: ${your_host}
+SONAR_TOKEN: ${your_sonar_token}
+
+stages: 
+  - test
+  - sonarqube-analysis
+
+test:
+  stage: test
+  image: gradle:jre11-slim
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .test/cache
+  script: 
+    - ./gradlew clean test
+  only:
+    - merge_requests
+  artifacts:
+    untracked: true
+
+sonarqube-analysis:
+  stage: sonarqube-analysis
+  image: gradle:jre11-slim
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: 0
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  dependencies:
+      - test
+  script: 
+    - ./gradlew sonarqube
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.projectName=${CI_PROJECT_NAME}
+      -Dsonar.projectKey=${CI_PROJECT_NAME}
+      -Dsonar.pullrequest.key=${CI_MERGE_REQUEST_IID}
+      -Dsonar.pullrequest.branch=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+      -Dsonar.pullrequest.base=master
+  only:
+    - merge_requests
