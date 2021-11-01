@@ -1,7 +1,6 @@
-package br.com.***REMOVED***.conciliation.kafka.producer;
+package goobar;
 
-import br.com.***REMOVED***.conciliation.config.KafkaConfig;
-import br.com.***REMOVED***.conciliation.kafka.event.TecBanTransactionKafkaEvent;
+....
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
