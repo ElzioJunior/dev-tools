@@ -1,4 +1,4 @@
-package br.com.***REMOVED***.cardspayroll.model.namingStrategy;
+package foobar;
 
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.ImplicitBasicColumnNameSource;
