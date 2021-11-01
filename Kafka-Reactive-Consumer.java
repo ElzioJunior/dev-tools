@@ -1,4 +1,4 @@
-package br.com.***REMOVED***.paymentsnotificationservice.kafka.consumer;
+package foobar;
 
 .....
 import com.fasterxml.jackson.core.JsonProcessingException;
