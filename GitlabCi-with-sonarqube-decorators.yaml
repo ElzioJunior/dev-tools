@@ -1,3 +1,4 @@
+// SAVE THIS FILE AS sonarqube-decorator-template.yml IN YOUR ARCHITECTURE PROJECTS
 variables:
   SONAR_HOST_URL: http://your-sonarqube-host.com
   SONAR_TOKEN: your_token_generated_in_sonarqube
@@ -69,3 +70,15 @@ sonarqube-analysis:
   only:
     - merge_requests
     - master
+
+
+// AND THEN, SAVE THIS FILE AS A TEMPLATE IN SOME ARCHITECTURE PROJECT, AND JUST USE
+include:
+  - project: 'architecture/yourProjectNameHere'
+    ref: master
+    file: 'sonarqube-decorator-template.yml'
+
+stages:
+  - test
+  - sonarqube-register-repo
+  - sonarqube-analysis
