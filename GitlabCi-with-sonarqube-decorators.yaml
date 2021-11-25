@@ -1,0 +1,71 @@
+variables:
+  SONAR_HOST_URL: http://your-sonarqube-host.com
+  SONAR_TOKEN: your_token_generated_in_sonarqube
+
+stages:
+  - test
+  - sonarqube-register-repo
+  - sonarqube-analysis
+
+test:
+  stage: test
+  image: gradle:jre11-slim
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .test/cache
+  script:
+    - ./gradlew clean test coverageReport
+  only:
+    - merge_requests
+    - master
+  artifacts:
+    untracked: true
+
+sonarqube-register-repo:
+  stage: sonarqube-register-repo
+  image: alpine:latest
+  dependencies:
+    - test
+  script:
+    - apk add curl
+    - curl -s -o /dev/null -w "%{http_code}" -X POST 
+      -u "{SONAR_TOKEN}:" 
+      -H "application/x-www-form-urlencoded" 
+      -d "name=${CI_PROJECT_NAME}&project=${CI_PROJECT_NAME}"
+      "${SONAR_HOST_URL}/api/projects/create"
+    - curl -s -o /dev/null -w "%{http_code}" -X POST 
+      -u "{SONAR_TOKEN}:" 
+      -H "application/x-www-form-urlencoded" 
+      -d "almSetting=gitlab-agi&project=${CI_PROJECT_NAME}&repository=${CI_PROJECT_ID}&monorepo=false" 
+      "${SONAR_HOST_URL}/api/alm_settings/set_gitlab_binding"
+  only:
+    - merge_requests
+    - master
+
+sonarqube-analysis:
+  stage: sonarqube-analysis
+  image: gradle:jre11-slim
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: 0
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  dependencies:
+    - test
+  script:
+    - ./gradlew sonarqube
+      -Dsonar.host.url=${SONAR_HOST_URL}
+      -Dsonar.login=${SONAR_TOKEN}
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.projectName=${CI_PROJECT_NAME}
+      -Dsonar.projectKey=${CI_PROJECT_NAME}
+      -Dsonar.pullrequest.key=${CI_MERGE_REQUEST_IID}
+      -Dsonar.pullrequest.branch=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+      -Dsonar.pullrequest.base=master
+      -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/coverage/test/jacocoTestReport.xml
+  only:
+    - merge_requests
+    - master
