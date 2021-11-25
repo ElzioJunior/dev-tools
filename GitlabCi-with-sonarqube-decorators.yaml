@@ -30,12 +30,12 @@ sonarqube-register-repo:
   script:
     - apk add curl
     - curl -s -o /dev/null -w "%{http_code}" -X POST 
-      -u "{SONAR_TOKEN}:" 
+      -u "${SONAR_TOKEN}:" 
       -H "application/x-www-form-urlencoded" 
       -d "name=${CI_PROJECT_NAME}&project=${CI_PROJECT_NAME}"
       "${SONAR_HOST_URL}/api/projects/create"
     - curl -s -o /dev/null -w "%{http_code}" -X POST 
-      -u "{SONAR_TOKEN}:" 
+      -u "${SONAR_TOKEN}:" 
       -H "application/x-www-form-urlencoded" 
       -d "almSetting=gitlab-agi&project=${CI_PROJECT_NAME}&repository=${CI_PROJECT_ID}&monorepo=false" 
       "${SONAR_HOST_URL}/api/alm_settings/set_gitlab_binding"
